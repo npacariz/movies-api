@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Http\Request;
 use App\Movie;
@@ -11,8 +12,12 @@ class MoviesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $title = $request->query('title');
+        if($title) {
+            return Movie::where('title', 'LIKE', '%'. $title. '%')->get();
+        }
         return Movie::all();
     }
 
@@ -34,6 +39,16 @@ class MoviesController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'title' => [
+                'required',
+                Rule::unique('movies')->where('releaseDate', $request['releaseDate'])
+            ],
+            'releaseDate' => 'required',
+            'director' => 'required', 
+            'duration'  => 'required|numeric|min:2|max:500',
+            'imageUrl' => 'url'
+        ]);
         $movie = Movie::create($request->all());
         return $movie;
     }
