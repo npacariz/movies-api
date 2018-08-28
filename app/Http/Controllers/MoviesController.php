@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Validation\Rule;
 
+use App\Http\Requests\MoviesRequest;
 use Illuminate\Http\Request;
 use App\Movie;
 class MoviesController extends Controller
@@ -15,8 +15,14 @@ class MoviesController extends Controller
     public function index(Request $request)
     {
         $title = $request->query('title');
+        $take = $request->query('take');
+        $skip = $request->query('skip');
+       
         if($title) {
-            return Movie::where('title', 'LIKE', '%'. $title. '%')->get();
+            return Movie::where('title', 'LIKE', '%'. $title. '%')->take($take)->get();
+        }
+        if($take && $skip) {
+             return Movie::skip($skip)->take($take)->get();
         }
         return Movie::all();
     }
@@ -37,19 +43,9 @@ class MoviesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MoviesRequest $moviesRequest)
     {
-        $this->validate($request, [
-            'title' => [
-                'required',
-                Rule::unique('movies')->where('releaseDate', $request['releaseDate'])
-            ],
-            'releaseDate' => 'required',
-            'director' => 'required', 
-            'duration'  => 'required|numeric|min:2|max:500',
-            'imageUrl' => 'url'
-        ]);
-        $movie = Movie::create($request->all());
+        $movie = Movie::create($moviesRequest->all());
         return $movie;
     }
 
@@ -82,9 +78,9 @@ class MoviesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(MoviesRequest $moviesRequest, $id)
     {
-       $movie = Movie::where('id', $id)->update($request->all());
+        $movie = Movie::where('id', $id)->update($moviesRequest->all());
         return $movie;
     }
 
