@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-use  App\Http\Requests\UserRequest;
+use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 
@@ -14,7 +16,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -81,8 +83,14 @@ class AuthController extends Controller
         ]);
     }
 
+    // function for adding user to database
 
-    public function register(UserRequest $request) {
-        
+    public function register(UserRequest $request) 
+    {   
+        User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => bcrypt($request['password']),
+        ]);
     }
 }
