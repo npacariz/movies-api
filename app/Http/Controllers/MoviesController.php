@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MoviesRequest;
-use App\Http\Requests\Request;  
+use Illuminate\Http\Request;
 use App\Movie;
 class MoviesController extends Controller
 {
